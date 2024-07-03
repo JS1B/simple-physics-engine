@@ -5,7 +5,9 @@ from ..gl_object import glObject
 
 
 class Ball(glObject):
-    def __init__(self, x, y, z, size, rotation_deg, *, color=(1.0, 0.0, 0.0)):
+    def __init__(
+        self, x, y, z, size, rotation_deg: tuple[float], *, color=(1.0, 0.0, 0.0)
+    ):
         super().__init__(x, y, z, size, rotation_deg=rotation_deg, color=color)
 
     def draw(self):

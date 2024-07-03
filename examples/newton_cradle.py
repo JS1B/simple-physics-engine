@@ -61,8 +61,11 @@ if __name__ == "__main__":
 
     engine.add_child(world)
 
-    # Give an initial velocity
+    # Give initial parameters
     engine._children[0]._children[0].rotation_deg = (0, 0, -50)
+    engine._children[0]._children[1].rotation_deg = (0, 0, -20)
+    engine._children[0]._children[1]._children[0]._children[0].size = 10
+    engine._children[0]._children[1]._children[0]._children[0]._children[0].size = 10
     # engine._children[0]._children[0].assign_angular_velocity((0, 0, -50))
 
     engine.run()

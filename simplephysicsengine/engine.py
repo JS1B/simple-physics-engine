@@ -41,8 +41,7 @@ class Engine(glObject):
             if event.type == pygame.QUIT or (
                 event.type == pygame.KEYDOWN and event.key == pygame.K_q
             ):
-                pygame.quit()
-                sys.exit(0)
+                self.exit()
             elif event.type == pygame.MOUSEMOTION:
                 if self.left_button_down:
                     self.rotation_deg[0] += (
@@ -95,7 +94,7 @@ class Engine(glObject):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        def enable_debug(obj):
+        def enable_debug(obj: glObject):
             for child in obj._children:
                 child.debug = self.debug
                 enable_debug(child)
@@ -118,6 +117,10 @@ class Engine(glObject):
 
             pygame.display.flip()
             pygame.time.wait(10)
+
+    def exit(self):
+        pygame.quit()
+        sys.exit(0)
 
     def check_collisions(self):
         def find_closest_collision_handler(self):

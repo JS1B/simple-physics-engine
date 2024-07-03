@@ -21,7 +21,9 @@ class glObject(ABC):
         self.y = y
         self.z = z
 
-        assert len(rotation_deg) == 3, "Rotation must be a 3-tuple"
+        assert (
+            isinstance(rotation_deg, tuple) and len(rotation_deg) == 3
+        ), "Rotation must be a 3-tuple"
         self.rotation_deg = np.array(rotation_deg)
 
         self.angular_velocity = np.array([0.0, 0.0, 0.0])
@@ -35,14 +37,22 @@ class glObject(ABC):
         self._children: List[glObject] = []
 
     def add_child(self, child: "glObject"):
-        child.setparent(self)
+        child.set_parent(self)
         self._children.append(child)
 
     def add_children(self, children: List["glObject"]):
         for child in children:
             self.add_child(child)
 
-    def setparent(self, parent: "glObject"):
+    def remove_child(self, child: "glObject"):
+        child.set_parent(None)
+        self._children.remove(child)
+
+    def remove_children(self, children: List["glObject"]):
+        for child in children:
+            self.remove_child(child)
+
+    def set_parent(self, parent: "glObject"):
         self.parent = parent
 
     def __update_variables(self):
