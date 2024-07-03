@@ -1,6 +1,7 @@
 # import pytest
 from simplephysicsengine import Engine, World
 
+
 class TestEngine:
     def test_initialization(self):
         engine = Engine(0, 0, -50)

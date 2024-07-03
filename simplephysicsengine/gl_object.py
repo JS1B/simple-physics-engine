@@ -4,8 +4,17 @@ import numpy as np
 
 
 class glObject(ABC):
-    def __init__(self, x: float, y: float, z: float, size: float, 
-                 *, rotation_deg: tuple[float] = (0.0, 0.0, 0.0), color: tuple[float] = (1.0, 1.0, 1.0), debug: bool = False):
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        z: float,
+        size: float,
+        *,
+        rotation_deg: tuple[float] = (0.0, 0.0, 0.0),
+        color: tuple[float] = (1.0, 1.0, 1.0),
+        debug: bool = False
+    ):
         self.debug = debug
 
         self.x = x
@@ -43,7 +52,9 @@ class glObject(ABC):
     def update(self, dt: float) -> None:
         self.__update_variables()
 
-        self.rotation_deg = np.array(self.rotation_deg) + np.array(self.angular_velocity) * dt
+        self.rotation_deg = (
+            np.array(self.rotation_deg) + np.array(self.angular_velocity) * dt
+        )
         self.rotation_deg %= 360
         self.rotation_deg = tuple(self.rotation_deg)
 
@@ -62,27 +73,27 @@ class glObject(ABC):
         def apply_rotation(x, y, z, rotation_deg):
             # Convert degrees to radians
             rx, ry, rz = np.radians(rotation_deg)
-            
+
             # Rotation matrices for x, y, z
-            rot_x = np.array([[1, 0, 0],
-                            [0, np.cos(rx), -np.sin(rx)],
-                            [0, np.sin(rx), np.cos(rx)]])
-            
-            rot_y = np.array([[np.cos(ry), 0, np.sin(ry)],
-                            [0, 1, 0],
-                            [-np.sin(ry), 0, np.cos(ry)]])
-            
-            rot_z = np.array([[np.cos(rz), -np.sin(rz), 0],
-                            [np.sin(rz), np.cos(rz), 0],
-                            [0, 0, 1]])
-            
+            rot_x = np.array(
+                [[1, 0, 0], [0, np.cos(rx), -np.sin(rx)], [0, np.sin(rx), np.cos(rx)]]
+            )
+
+            rot_y = np.array(
+                [[np.cos(ry), 0, np.sin(ry)], [0, 1, 0], [-np.sin(ry), 0, np.cos(ry)]]
+            )
+
+            rot_z = np.array(
+                [[np.cos(rz), -np.sin(rz), 0], [np.sin(rz), np.cos(rz), 0], [0, 0, 1]]
+            )
+
             # Combined rotation matrix
             rotation_matrix = np.dot(rot_z, np.dot(rot_y, rot_x))
-            
+
             # Apply rotation
             pos = np.array([x, y, z])
             rotated_pos = np.dot(rotation_matrix, pos)
-            
+
             return rotated_pos[0], rotated_pos[1], rotated_pos[2]
 
         x = 0.0
@@ -91,7 +102,9 @@ class glObject(ABC):
         current = self
 
         safety_counter = 0
-        while current is not ancestor and safety_counter < 10: # Safety counter to prevent infinite loops, maybe raise an error/warn instead
+        while (
+            current is not ancestor and safety_counter < 10
+        ):  # Safety counter to prevent infinite loops, maybe raise an error/warn instead
             safety_counter += 1
             x, y, z = apply_rotation(x, y, z, current.rotation_deg)
             x += current.x
@@ -100,4 +113,3 @@ class glObject(ABC):
             current = current.parent
 
         return x, y, z
-

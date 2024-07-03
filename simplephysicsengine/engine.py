@@ -6,7 +6,6 @@ from OpenGL.GLU import *
 import warnings
 import sys
 from itertools import combinations
-from typing import List
 
 from .mixins import HasCollisionMixin
 from .gl_object import glObject
@@ -14,38 +13,44 @@ from .physics import Hitbox
 
 
 class Engine(glObject):
-    def __init__(self, x, y, z=-50, *, debug = False):
+    def __init__(self, x, y, z=-50, *, debug=False):
         super().__init__(x, y, z, 0, rotation_deg=(0.0, 0.0, 0.0), debug=debug)
 
         warnings.filterwarnings("once", category=UserWarning, module="main")
-        
+
         self.timer = pygame.time.Clock()
-        
+
         pygame.init()
-        
+
         self.display = (800, 600)
         pygame.display.set_mode(self.display, DOUBLEBUF | OPENGL)
-        
+
         self.mouse_down = False
         self.left_button_down = False
         self.right_button_down = False
         self.last_mouse_pos = (0, 0)
-        
+
     def update(self):
         dt = self.timer.tick(60) / 1000
         for child in self._children:
             child.update(dt)
         self.check_collisions()
-        
+
     def handle_events(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
+            if event.type == pygame.QUIT or (
+                event.type == pygame.KEYDOWN and event.key == pygame.K_q
+            ):
                 pygame.quit()
                 sys.exit(0)
             elif event.type == pygame.MOUSEMOTION:
                 if self.left_button_down:
-                    self.rotation_deg[0] += (event.pos[1] - self.last_mouse_pos[1]) * 0.1
-                    self.rotation_deg[1] += (event.pos[0] - self.last_mouse_pos[0]) * 0.1
+                    self.rotation_deg[0] += (
+                        event.pos[1] - self.last_mouse_pos[1]
+                    ) * 0.1
+                    self.rotation_deg[1] += (
+                        event.pos[0] - self.last_mouse_pos[0]
+                    ) * 0.1
                     self.last_mouse_pos = event.pos
                 elif self.right_button_down:
                     self.x += (event.pos[0] - self.last_mouse_pos[0]) * 0.1
@@ -83,7 +88,7 @@ class Engine(glObject):
         glLightfv(GL_LIGHT0, GL_POSITION, light_position)
 
         glEnable(GL_DEPTH_TEST)
-        
+
         # Enable antialiasing
         glEnable(GL_LINE_SMOOTH)
         glEnable(GL_POLYGON_SMOOTH)
@@ -94,23 +99,23 @@ class Engine(glObject):
             for child in obj._children:
                 child.debug = self.debug
                 enable_debug(child)
-                
+
         if self.debug:
             enable_debug(self)
 
         while True:
             self.handle_events()
-            
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-            
+
             glLoadIdentity()
             glTranslatef(self.x, self.y, self.z)
             glRotatef(self.rotation_deg[0], 1, 0, 0)
             glRotatef(self.rotation_deg[1], 0, 1, 0)
-            
+
             self.update()
             self.draw()
-                
+
             pygame.display.flip()
             pygame.time.wait(10)
 
@@ -122,7 +127,7 @@ class Engine(glObject):
                     return current
                 current = current.parent
             raise Error("No collision handler found in the hierarchy")
-        
+
         def find_closest_common_ancestor(obj1, obj2) -> None | glObject:
             # Traverse up from obj1 and collect all its ancestors
             ancestors = set()
@@ -137,9 +142,12 @@ class Engine(glObject):
                 if current2 in ancestors:
                     return current2
                 current2 = current2.parent
-            
+
             # raise Error("No common ancestor found. Did you collide ")  # No common ancestor found, which should not happen if both objects belong to the same tree
-            warnings.warn("No common ancestor found. Did you collide objects from different trees?", category=UserWarning)
+            warnings.warn(
+                "No common ancestor found. Did you collide objects from different trees?",
+                category=UserWarning,
+            )
             return None  # No common ancestor found, which should not happen if both objects belong to the same tree
 
         def get_flattened_objects(self):
@@ -148,11 +156,13 @@ class Engine(glObject):
                 flattened_objects.append(child)
                 flattened_objects.extend(get_flattened_objects(child))
             return flattened_objects
-        
+
         # Filter out objects that have no hitbox
         flattened_objects = get_flattened_objects(self)
-        collidable_objects = [obj for obj in flattened_objects if isinstance(obj, Hitbox)]
-        
+        collidable_objects = [
+            obj for obj in flattened_objects if isinstance(obj, Hitbox)
+        ]
+
         for obj1, obj2 in combinations(collidable_objects, 2):
             common_ancestor = find_closest_common_ancestor(obj1, obj2)
             if obj1.check_collision(obj2, common_ancestor):
