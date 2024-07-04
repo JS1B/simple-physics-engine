@@ -15,7 +15,7 @@ class glObject(ABC):
         color: tuple[float] = (1.0, 1.0, 1.0),
         debug: bool = False
     ):
-        self.debug = debug
+        self._debug = debug
 
         self.x = x
         self.y = y
@@ -38,6 +38,7 @@ class glObject(ABC):
 
     def add_child(self, child: "glObject"):
         child.set_parent(self)
+        child.debug = self.debug
         self._children.append(child)
 
     def add_children(self, children: List["glObject"]):
@@ -123,3 +124,13 @@ class glObject(ABC):
             current = current.parent
 
         return x, y, z
+
+    @property
+    def debug(self):
+        return self._debug
+
+    @debug.setter
+    def debug(self, value: bool):
+        self._debug = value
+        for child in self._children:
+            child.debug = value

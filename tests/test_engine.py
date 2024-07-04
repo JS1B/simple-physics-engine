@@ -62,17 +62,13 @@ class TestEngine:
         assert e.value.code == 0
 
     def test_enable_debug(self):
-        engine = Engine(0, 0, -50, debug=True)
+        engine = Engine(0, 0, -50, debug=False)
         world = World(0.0, 0.0, 0.0, 0.0)
         ball = Ball(0.0, 0.0, 0.0, 0.0, (0.0, 0.0, 0.0))
 
+        engine.debug = True
         world.add_child(ball)
         engine.add_child(world)
-        pygame.event.post(pygame.event.Event(QUIT))
-
-        with pytest.raises(SystemExit) as e:
-            engine.run()
-        assert e.type == SystemExit
 
         assert engine.debug is True
         assert world.debug is True

@@ -126,14 +126,6 @@ class Engine(glObject):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        def enable_debug(obj: glObject):
-            for child in obj._children:
-                child.debug = self.debug
-                enable_debug(child)
-
-        if self.debug:
-            enable_debug(self)
-
         while True:
             self.handle_events()
 
