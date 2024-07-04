@@ -10,6 +10,10 @@ from itertools import combinations
 from .mixins import HasCollisionMixin
 from .gl_object import glObject
 from .physics import Hitbox
+from .config_loader import load_key_mappings
+
+
+CONFIG_PATH: Constant = "simplephysicsengine/config/key_mappings.json"
 
 
 class Engine(glObject):
@@ -30,6 +34,8 @@ class Engine(glObject):
         self.right_button_down = False
         self.last_mouse_pos = (0, 0)
 
+        self.key_mappings = load_key_mappings(CONFIG_PATH)
+
     def update(self):
         dt = self.timer.tick(60) / 1000
         for child in self._children:
@@ -37,10 +43,36 @@ class Engine(glObject):
         self.check_collisions()
 
     def handle_events(self):
+        key_map = {
+            mapping.action: mapping.key for mapping in self.key_mappings.mappings
+        }
+
+        keys = pygame.key.get_pressed()
+
+        if keys[key_map["forward"]]:
+            self.z += 0.1
+        if keys[key_map["backward"]]:
+            self.z -= 0.1
+        if keys[key_map["left"]]:
+            self.x -= 0.1
+        if keys[key_map["right"]]:
+            self.x += 0.1
+        if keys[key_map["up"]]:
+            self.y += 0.1
+        if keys[key_map["down"]]:
+            self.y -= 0.1
+        if keys[key_map["debug"]]:
+            self.debug = not self.debug
+        if keys[key_map["reset"]]:
+            self.x = 0
+            self.y = 0
+            self.z = -50
+            self.rotation_deg = (0.0, 0.0, 0.0)
+        if keys[key_map["quit"]]:
+            self.exit()
+
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or (
-                event.type == pygame.KEYDOWN and event.key == pygame.K_q
-            ):
+            if event.type == pygame.QUIT:
                 self.exit()
             elif event.type == pygame.MOUSEMOTION:
                 if self.left_button_down:

@@ -1,0 +1,13 @@
+{
+    "left": "K_a",
+    "right": "K_d",
+    "forward": "K_w",
+    "backward": "K_s",
+    "up": "K_LSHIFT",
+    "down": "K_LCTRL",
+    "reset": "K_SPACE",
+    
+    "quit": "K_q",
+
+    "debug": "K_F1"
+}

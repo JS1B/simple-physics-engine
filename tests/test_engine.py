@@ -54,12 +54,8 @@ class TestEngine:
 
     def test_exit(self):
         engine = Engine(0, 0, -50)
-        events = [
-            pygame.event.Event(QUIT),
-            pygame.event.Event(KEYDOWN, key=K_q),
-        ]
-        for event in events:
-            pygame.event.post(event)
+
+        pygame.event.post(pygame.event.Event(QUIT))
         with pytest.raises(SystemExit) as e:
             engine.run()
         assert e.type == SystemExit
@@ -72,7 +68,7 @@ class TestEngine:
 
         world.add_child(ball)
         engine.add_child(world)
-        pygame.event.post(pygame.event.Event(KEYDOWN, key=K_q))
+        pygame.event.post(pygame.event.Event(QUIT))
 
         with pytest.raises(SystemExit) as e:
             engine.run()
